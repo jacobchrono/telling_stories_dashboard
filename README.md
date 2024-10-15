@@ -30,4 +30,6 @@ You should use `html\dynamic_scatter_fail.html` for future examples of bad graph
 ![gpt1](assets\gpt1.png)
 ![gpt2](assets\gpt2.png)
 
+My vision is to add a widget here the user can build a custom regression model of the full data. I had to limit the number of filters for file size and ability to share so my idea my not be within the scope of the project. Can we share a hosted version over the message board? The final product for this submission is `html\vehicle_dashboard.html`. The relevant python script is `scripts\combine_montana_4.py.`
 
+https://chatgpt.com/share/670ea0a5-5724-800a-8e8f-397db08135d9
