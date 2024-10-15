@@ -18,4 +18,7 @@ https://chatgpt.com/share/670daba1-86f0-800a-9c97-b771790225d8
 
 Here is a static view of my car, I stopped filtering as the sample is small.
 
-![alt text](my_car.png)
+![alt text](assets\my_car.png)
+
+Github Repo:
+https://github.com/jacobchrono/telling_stories_dashboard
