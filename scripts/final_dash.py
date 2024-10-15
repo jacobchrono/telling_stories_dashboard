@@ -13,9 +13,9 @@ import os
 
 # Set working directory to the script's directory (using relative path)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-print(os.getcwd())
+
 # Load the dataset
-df = pd.read_excel(r'data\montana_listings.xlsx')
+df = pd.read_excel('data/montana_listings.xlsx')
 
 # Rename problematic column
 df = df.rename(columns={'type': 'vehicle_type'})
