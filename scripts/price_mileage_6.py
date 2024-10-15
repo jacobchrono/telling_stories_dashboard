@@ -150,6 +150,12 @@ def update_graph(selected_make, selected_model, selected_state, selected_year,
                      labels={'log_odometer': 'Log of Odometer', 'price': 'Price'},
                      title='Price vs. Log of Mileage')
 
+    fig.update_layout(
+        plot_bgcolor='rgba(0,0,0,0)',
+        xaxis=dict(showgrid=True, gridcolor='rgba(200,200,200,0.2)'),
+        yaxis=dict(showgrid=True, gridcolor='rgba(200,200,200,0.2)')
+    )
+
     if regression_option and 'regression' in regression_option:
         X = sm.add_constant(filtered_df['log_odometer'])
         model = sm.OLS(filtered_df['price'], X).fit()
