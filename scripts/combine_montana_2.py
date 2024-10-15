@@ -101,9 +101,9 @@ dashboard = pn.Column(
 )
 
 # ===== SERVE THE DASHBOARD ===== #
-# dashboard.show(port=5006)
+dashboard.show(port=5006)
 
 # ===== SAVE THE DASHBOARD TO HTML ===== #
-dashboard.save('vehicle_dashboard.html', embed=True)
+# dashboard.save('vehicle_dashboard.html', embed=True)
 
-print("Dashboard saved as 'vehicle_dashboard.html'. You can open it locally in a browser.")
+# print("Dashboard saved as 'vehicle_dashboard.html'. You can open it locally in a browser.")
