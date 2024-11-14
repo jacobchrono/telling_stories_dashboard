@@ -11,11 +11,8 @@ import statsmodels.api as sm
 import plotly.express as px
 import os
 
-# Set working directory to the script's directory (using relative path)
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
 # Load the dataset
-df = pd.read_excel('data/montana_listings.xlsx')
+df = pd.read_excel(r'C:\Users\jakeq\OneDrive\Documents\GitHub\telling_stories_dashboard\data\montana_listings.xlsx')
 
 # Rename problematic column
 df = df.rename(columns={'type': 'vehicle_type'})
@@ -28,13 +25,19 @@ title_filter = st.sidebar.multiselect("Title", df["title"].unique())
 condition_filter = st.sidebar.multiselect("Condition", df["condition"].unique())
 vehicle_type_filter = st.sidebar.multiselect("Vehicle Type", df["vehicle_type"].unique())
 
+# Year filter using a range slider
+min_year = int(df["year"].min())
+max_year = int(df["year"].max())
+year_filter = st.sidebar.slider("Year", min_year, max_year, (min_year, max_year))
+
 # Apply filters
 filtered_df = df[
-    (df["make"].isin(make_filter) if make_filter else True) &
-    (df["model"].isin(model_filter) if model_filter else True) &
-    (df["title"].isin(title_filter) if title_filter else True) &
-    (df["condition"].isin(condition_filter) if condition_filter else True) &
-    (df["vehicle_type"].isin(vehicle_type_filter) if vehicle_type_filter else True)
+    (df["make"].isin(make_filter) if make_filter else pd.Series([True] * len(df))) &
+    (df["model"].isin(model_filter) if model_filter else pd.Series([True] * len(df))) &
+    (df["title"].isin(title_filter) if title_filter else pd.Series([True] * len(df))) &
+    (df["condition"].isin(condition_filter) if condition_filter else pd.Series([True] * len(df))) &
+    (df["vehicle_type"].isin(vehicle_type_filter) if vehicle_type_filter else pd.Series([True] * len(df))) &
+    (df["year"].between(year_filter[0], year_filter[1]))
 ]
 
 # Scatter plot of price vs log(mileage)
@@ -59,13 +62,13 @@ model = sm.OLS(filtered_df["price"], X).fit()
 r_squared = model.rsquared
 corr_coef = np.corrcoef(np.log1p(filtered_df["odometer"]), filtered_df["price"])[0, 1]
 num_observations = len(filtered_df)
-coef_significance = model.pvalues[1] < 0.05
+coef_significance = model.pvalues.iloc[1] < 0.05
 
 st.pyplot(fig)
 st.markdown(f"**R²**: {r_squared:.2f}")
 st.markdown(f"**Correlation Coefficient**: {corr_coef:.2f}")
 st.markdown(f"**Number of Observations**: {num_observations}")
-st.markdown(f"**Coefficient Interpretation**: A 1% increase in mileage results in a {model.params[1]:.2f} change in price.")
+st.markdown(f"**Coefficient Interpretation**: A 1% increase in mileage results in a {model.params.iloc[1]:.2f} change in price.")
 st.markdown(f"**Statistical Significance**: {'Yes' if coef_significance else 'No'}")
 
 # Choropleth of Residuals
