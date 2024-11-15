@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import statsmodels.api as sm
 import plotly.express as px
-import os
 
 # Load the dataset
 df = pd.read_excel(r'C:\Users\jakeq\OneDrive\Documents\GitHub\telling_stories_dashboard\data\montana_listings.xlsx')
