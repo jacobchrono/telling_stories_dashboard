@@ -1,5 +1,5 @@
 # run this from the command line
-# streamlit run C:\Users\jakeq\OneDrive\Documents\GitHub\telling_stories_dashboard\final_dash.py
+# streamlit run C:\Users\jakeq\OneDrive\Documents\GitHub\telling_stories_dashboard\final_dash_2.py
 
 # Imports
 import streamlit as st
@@ -11,13 +11,17 @@ import statsmodels.api as sm
 import plotly.express as px
 
 # Load the dataset
-# Read in the Excel file containing Montana vehicle listings data.
-# This dataset is expected to contain columns relevant to vehicle listings.
 df = pd.read_excel(r'C:\Users\jakeq\OneDrive\Documents\GitHub\telling_stories_dashboard\data\montana_listings.xlsx')
 
 # Rename problematic column
-# Rename the 'type' column to 'vehicle_type' to avoid conflicts with Python keywords.
 df = df.rename(columns={'type': 'vehicle_type'})
+
+# Convert price to numeric, removing any non-numeric values
+df['price'] = pd.to_numeric(df['price'], errors='coerce')
+df['odometer'] = pd.to_numeric(df['odometer'], errors='coerce')
+
+# Drop rows with NaN values in price or odometer
+df = df.dropna(subset=['price', 'odometer'])
 
 # Sidebar for outlier exclusion based on price range
 st.sidebar.header("Outlier Exclusion")
@@ -41,7 +45,7 @@ if exclude_outliers:
 # Filter data based on user-selected price range
 filtered_data = df[(df["price"] >= min_price) & (df["price"] <= max_price)]
 
-# Sidebar Filters for other characteristics
+# Sidebar Filters
 st.sidebar.header("Filters")
 
 # Sidebar Filters
@@ -93,24 +97,31 @@ st.markdown(f"**R²**: {model.rsquared:.2f}")
 st.markdown(f"**Number of Observations**: {len(filtered_df)}")
 st.markdown(f"**Coefficient Interpretation**: A 1% increase in mileage results in a {model.params.iloc[1]:.2f} change in price.")
 st.markdown(f"**Statistical Significance at \u03B1 = 0.05**: {'Yes' if coef_significance else 'No'}")
+
+# Calculate residuals for the choropleth
+filtered_df['predicted_price'] = model.predict(X)
+filtered_df['residual'] = filtered_df['price'] - filtered_df['predicted_price']
+
 # Choropleth of Residuals
-st.header("Choropleth of Residuals")
+st.header("Geographic Distribution")
 
 # Additional check for columns' existence to avoid errors
 if 'latitude' in filtered_df.columns and 'longitude' in filtered_df.columns:
-    fig = px.scatter_geo(
-        filtered_df,
+    # Remove any rows where lat/lon is null
+    geo_df = filtered_df.dropna(subset=['latitude', 'longitude'])
+    
+    fig = px.scatter_mapbox(
+        geo_df,
         lat="latitude",
         lon="longitude",
         color="residual",
-        color_continuous_scale=px.colors.sequential.Viridis,
-        title="Geographic Distribution of Price"
-    )
-    fig.update_geos(
-    visible=False,  # Optional: Hide default map controls
-    fitbounds=None,  # Turn off auto-zooming
-    center={"lat": 46.8797, "lon": -110.3626},  # Approximate center of Montana
-    projection_scale=5,  # Adjust to control the zoom level (lower = zoomed out, higher = zoomed in)
+        size="price",  # Add size variation based on price
+        color_continuous_scale="RdBu",
+        zoom=4,
+        center={"lat": 46.8797, "lon": -110.3626},  # Center of Montana
+        mapbox_style="carto-positron",  # Use a free mapbox style
+        title="Geographic Distribution of Prices and Residuals",
+        hover_data=["make", "model", "year", "price"]  # Add hover information
     )
     st.plotly_chart(fig)
 else:
@@ -123,7 +134,8 @@ st.header("Custom Regression Model")
 available_vars = ['paint', 'drive', 'cylinders', 'fuel', 'transmission', 'condition']
 selected_vars = st.multiselect(
     "Select 1 or 2 Categorical Variables for the Custom Model",
-    available_vars, max_selections=2
+    available_vars,
+    max_selections=2
 )
 
 # Ensure selection meets the requirement of 1 or 2 variables
@@ -131,25 +143,43 @@ if st.button("Run Model"):
     if len(selected_vars) == 0:
         st.error("Please select at least one categorical variable.")
     else:
-        # Prepare the design matrix for the regression model
-                # Start the design matrix with log(odometer) as a continuous predictor
+        # Create design matrix
         X_custom = pd.DataFrame({'log_odometer': np.log1p(filtered_df['odometer'])})
-        # add dummies of the catergorical vars
-        X_custom = pd.get_dummies(filtered_df[selected_vars], drop_first=True)
-        X_custom = sm.add_constant(X_custom)  # Adding constant term for intercept
         
-        #
-        print(filtered_df.dtypes)
-        print(X_custom.dtypes)
-
-        model_custom = sm.OLS(filtered_df["price"], X_custom).fit()
-
-        # Display model equation and summary statistics
-        st.write(f"**Equation**: Price = {model_custom.params[0]:.2f} + " +
-                 " + ".join([f"{coef:.2f}*{var}" for var, coef in model_custom.params[1:].items()]))
-        st.markdown(f"**R²**: {model_custom.rsquared:.2f}")
-        st.markdown(f"**F-Statistic**: {model_custom.fvalue:.2f}")
-        st.markdown(f"**Number of Observations**: {model_custom.nobs}")
+        # Add dummy variables for selected categorical variables
+        for var in selected_vars:
+            # Convert the column to string type to ensure proper dummy creation
+            dummies = pd.get_dummies(filtered_df[var].astype(str), prefix=var, drop_first=True)
+            X_custom = pd.concat([X_custom, dummies], axis=1)
+        
+        # Add constant
+        X_custom = sm.add_constant(X_custom)
+        
+        # Ensure all columns are numeric
+        X_custom = X_custom.apply(pd.to_numeric, errors='coerce')
+        
+        # Drop any rows with NaN values
+        mask = X_custom.notna().all(axis=1)
+        X_custom = X_custom[mask]
+        y = filtered_df['price'][mask]
+        
+        # Fit the model
+        try:
+            model_custom = sm.OLS(y, X_custom).fit()
+            
+            # Display model equation and summary statistics
+            st.write("**Model Summary:**")
+            st.write(f"**R²**: {model_custom.rsquared:.2f}")
+            st.write(f"**F-Statistic**: {model_custom.fvalue:.2f}")
+            st.write(f"**Number of Observations**: {model_custom.nobs}")
+            
+            # Display coefficients
+            st.write("\n**Coefficients:**")
+            for var, coef in model_custom.params.items():
+                st.write(f"{var}: {coef:.2f}")
+                
+        except Exception as e:
+            st.error(f"Error fitting model: {str(e)}")
 
 if st.button("Clear"):
     st.experimental_rerun()

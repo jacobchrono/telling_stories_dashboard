@@ -272,9 +272,6 @@ manual_location_to_state = {
 # Re-apply the mapping with the extended dictionary
 df['state'] = df['location'].str.lower().map(manual_location_to_state)
 
-# Save the updated DataFrame with resolved state mappings
-df.to_excel(r'data\carbitrage-data-updated.xlsx', index=False)
-
 print("State mapping updated successfully with extended manual corrections.")
 
 # Display remaining missing state mappings

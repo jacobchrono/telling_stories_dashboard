@@ -1,3 +1,5 @@
+# this code produced a locally hosted dash app
+
 import pandas as pd
 import numpy as np
 import dash
@@ -9,7 +11,7 @@ import statsmodels.api as sm
 
 # load the data
 try:
-    df = pd.read_excel(r'data\\carbitrage-data-updated.xlsx')
+    df = pd.read_excel('data/carbitrage-data-updated.xlsx')
 except FileNotFoundError:
     print("Data file not found. Please check the file path.")
     df = pd.DataFrame()  # or provide a default DataFrame
