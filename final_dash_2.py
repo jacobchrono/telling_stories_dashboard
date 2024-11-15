@@ -9,9 +9,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import statsmodels.api as sm
 import plotly.express as px
+import os
+
+# Set file path dynamically
+current_file_dir = os.path.dirname(os.path.abspath(__file__))
+file_path = os.path.join(current_file_dir, 'data', 'montana_listings.csv')
 
 # Load the dataset
-df = pd.read_excel(r'C:\Users\jakeq\OneDrive\Documents\GitHub\telling_stories_dashboard\data\montana_listings.xlsx')
+df = pd.read_csv(file_path)
 
 # Rename problematic column
 df = df.rename(columns={'type': 'vehicle_type'})
