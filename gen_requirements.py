@@ -1,4 +1,9 @@
 # https://chatgpt.com/share/6737011d-eef4-800a-9cc6-933945fb6dc4
+# This is a script to generate a requirements.txt.
+# The requirements.txt tells the streamlit cloud what versions of the packages I am using to run the script 
+# final_dash_2.py. 
+# the script needs to run from the comand line. 
+
 import subprocess
 import os
 
