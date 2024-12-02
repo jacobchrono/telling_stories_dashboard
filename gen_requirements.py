@@ -2,7 +2,6 @@
 # This is a script to generate a requirements.txt.
 # The requirements.txt tells the streamlit cloud what versions of the packages I am using to run the script 
 # final_dash_2.py. 
-# the script needs to run from the comand line. 
 
 import subprocess
 import os

@@ -1,12 +1,10 @@
 ## Telling Stories with Data Dashboard
 #### Jacob Clement
 
-
-
 ### Inital submission
-The final product for my first submission is `price_mileage_6.py`.
+The final product for my first submission is `price_mileage_6.py`. 
 
-I scraped `state` from craigslist and used ChatGPT to fill in the gaps. I was almost done with the process so I figured I would submit what I have and try to work with the data for Montana to create a final polished product. The code for the scraping is `scrape_state.py`.
+I scraped `state` from craigslist and used ChatGPT to fill in the gaps. I was almost done with the process so I figured I would submit what I have and try to work with the data for Montana to create a final polished product. The code for the scraping is `scripts/scrape_state.py`.
 
 ChatGPT:
 dashboard creation:
@@ -27,7 +25,7 @@ https://github.com/jacobchrono/telling_stories_dashboard
 
 ### Second Submission
 
-I used plotly for this portion of the project.
+I used panel for this portion of the project.
 
 You should use `html\dynamic_scatter_fail.html` for future examples of bad graphs. ChatGPT defended its output but I could not attach the full convertsation due to a pasted image.
 
@@ -40,4 +38,4 @@ https://chatgpt.com/share/670ea0a5-5724-800a-8e8f-397db08135d9
 
 ### Third Submission
 
-For this submission, I created a streamlit app. Please note that this must be run from the command line. The script is at `final_dash.py`.
+For this submission, I created a streamlit app. Please note that this must be run from the command line. The script is at `final_dash.py`. It is also deployed to the streamlit community cloud 
